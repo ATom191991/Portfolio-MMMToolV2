@@ -1,0 +1,7 @@
+streamlit
+pandas
+statsmodels
+openpyxl
+fpdf
+matplotlib
+seaborn
