@@ -1,4 +1,4 @@
-# Market Mix Modelling (MMM) ROI Calculator
+# Market Mix Modelling (MMM) ROI Dashboard
 
 This repository provides a simple, extensible web application for Market Mix Modelling (MMM) analysis. The app enables users to upload marketing data (CSV or Excel), perform MMM using regression, and view the Return on Investment (ROI) for each marketing activity/channel. The MVP is built with Python and Streamlit for quick, interactive analysis.
 
@@ -6,11 +6,12 @@ This repository provides a simple, extensible web application for Market Mix Mod
 
 ## Features
 
+- **Landing page** for workflow selection and onboarding
 - **Upload marketing data** in CSV or Excel format
 - **Form-based UI** for campaign information and data upload
 - **Runs Market Mix Modelling** (MMM) using linear regression
 - **Calculates ROI** per marketing channel
-- **Displays results** in an interactive table
+- **Displays results** in an interactive table and dashboard
 - **Sample data** provided for easy testing
 - **Advanced insights** and visualizations (bar, pie, heatmap)
 - **Downloadable, well-formatted PDF dashboard**
@@ -20,8 +21,10 @@ This repository provides a simple, extensible web application for Market Mix Mod
 ## File Structure
 
 ```
-.
-├── streamlit_app.py             # Main Streamlit app
+MarketMixModelPF/
+├── streamlit_app.py             # Main Streamlit app (entry point with navigation)
+├── landing_page.py              # Landing page (modern, branded)
+├── report_dashboard.py          # Report page (dashboard and analytics)
 ├── backend/
 │   └── mmm.py                   # MMM and ROI calculation logic
 ├── data/
@@ -63,7 +66,9 @@ streamlit run streamlit_app.py
 
 ## Usage
 
-1. Select "Run Sample Data" or upload your marketing data file (`.csv` or `.xlsx`). See the sample data in `/data/sample_marketing_data.csv` for the expected format:
+1. Start at the **Landing Page**.  
+   Choose "Run Sample Report" to see a demo, or "Upload Your Data" to analyze your own marketing data file (`.csv` or `.xlsx`).  
+   See the sample data in `/data/sample_marketing_data.csv` for the expected format:
 
     | Date       | Channel | Spend | Sales  |
     |------------|---------|-------|--------|
@@ -105,7 +110,7 @@ All dependencies are listed in `requirements.txt`.
 ## Customization
 
 - You can extend the MMM logic in `backend/mmm.py`
-- Add more visualizations or download options in `streamlit_app.py`
+- Add more visualizations or download options in `report_dashboard.py`
 - Integrate with databases or authentication as needed
 
 ---

@@ -2,7 +2,6 @@ import pandas as pd
 import statsmodels.api as sm
 
 def run_mmm_and_calculate_roi(df):
-    # Data validation
     required_cols = {"Date", "Channel", "Spend", "Sales"}
     if not required_cols.issubset(df.columns):
         raise ValueError(f"Data must contain columns: {required_cols}")
