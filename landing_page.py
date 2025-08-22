@@ -90,11 +90,11 @@ def landing_page():
     if run_demo:
         st.session_state.page = "report"
         st.session_state.use_sample = True
-        st.experimental_rerun()
+        st.rerun()
     elif upload_data:
         st.session_state.page = "report"
         st.session_state.use_sample = False
-        st.experimental_rerun()
+        st.rerun()
 
     st.markdown(
         """
