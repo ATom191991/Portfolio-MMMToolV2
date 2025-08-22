@@ -1,19 +1,13 @@
 import streamlit as st
+from landing_page import landing_page
+from report_dashboard import report_dashboard
 
-# Initialize session state
 if "page" not in st.session_state:
     st.session_state.page = "landing"
 if "use_sample" not in st.session_state:
     st.session_state.use_sample = True
 
-# Import pages
-def show_landing():
-    import landing_page
-
-def show_report():
-    import report_dashboard
-
 if st.session_state.page == "landing":
-    show_landing()
+    landing_page()
 elif st.session_state.page == "report":
-    show_report()
+    report_dashboard()
