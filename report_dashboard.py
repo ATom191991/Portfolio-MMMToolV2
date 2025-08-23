@@ -6,6 +6,46 @@ import seaborn as sns
 
 from backend.mmm import run_mmm_and_calculate_roi
 
+# --- Custom CSS for theme ---
+st.markdown("""
+    <style>
+    body, .main, .stApp {
+        background-color: #F2F2F2 !important;
+        color: #111 !important;
+    }
+    .block-container {
+        background-color: #E6F0FF !important;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #cfd8dc;
+        padding: 1.5em 1em 1.5em 1em;
+        margin-bottom: 1.5em;
+    }
+    .kpi-block {
+        background-color: #E6F0FF !important;
+        border-radius: 10px;
+        padding: 1em;
+        margin-bottom: 0.5em;
+        box-shadow: 0 1px 4px #cfd8dc;
+        text-align: center;
+    }
+    .small-font {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 1em;
+    }
+    .stMetric {
+        color: #111 !important;
+    }
+    .roi-table-block {
+        background-color: #E6F0FF !important;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #cfd8dc;
+        padding: 2em 1em 2em 1em;
+        margin-bottom: 1.5em;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 def report_dashboard():
     SAMPLE_PATH = "data/sample_marketing_data.csv"
 
@@ -32,126 +72,78 @@ def report_dashboard():
     mer = revenue_attributed / total_spend if total_spend else 0
 
     st.title("Marketing Mix Modeling Dashboard")
-
     st.markdown(f"**Data Source:** {data_source}")
 
-    kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5 = st.columns(5)
-    kpi_col1.metric("Total Spend", f"${total_spend:,.0f}")
-    kpi_col2.metric("Revenue Attributed", f"${revenue_attributed:,.0f}")
-    kpi_col3.metric("ROI (Avg)", f"{roi_mean:.2f}")
-    kpi_col4.metric("Incremental Sales", f"${incremental_sales:,.0f}")
-    kpi_col5.metric("MER", f"{mer:.2f}")
+    # --- First Row: KPIs in blocks ---
+    st.markdown("<div class='block-container'>", unsafe_allow_html=True)
+    kpi_cols = st.columns(5)
+    kpi_labels = ["Total Spend", "Revenue Attributed", "ROI (Avg)", "Incremental Sales", "MER"]
+    kpi_values = [
+        f"${total_spend:,.0f}",
+        f"${revenue_attributed:,.0f}",
+        f"{roi_mean:.2f}",
+        f"${incremental_sales:,.0f}",
+        f"{mer:.2f}"
+    ]
+    for idx in range(5):
+        with kpi_cols[idx]:
+            st.markdown(f"<div class='kpi-block'><span style='font-size:1em;font-weight:600'>{kpi_labels[idx]}</span><br><span style='font-size:1.5em;font-weight:bold'>{kpi_values[idx]}</span></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+    # --- Second Row: Full ROI Table only ---
+    st.markdown("<div class='roi-table-block'>", unsafe_allow_html=True)
+    st.subheader("Full ROI Table")
+    st.dataframe(roi_df.style.format({"ROI": "{:.2f}", "Total Spend": "{:,.0f}", "Incremental Revenue": "{:,.0f}"}))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    chart_col1, chart_col2, chart_col3 = st.columns(3)
-
-    with chart_col1:
-        st.subheader("ROI by Channel (Bar Chart)")
-        fig, ax = plt.subplots(figsize=(4, 3))
-        roi_df["ROI"].plot(kind="bar", color="dodgerblue", ax=ax)
-        ax.set_ylabel("ROI")
-        st.pyplot(fig)
-
-    with chart_col2:
+    # --- Third Row: Channel Contribution Pie & Spend vs Revenue Bar ---
+    third_row = st.columns(2)
+    # Pie Chart block
+    with third_row[0]:
+        st.markdown("<div class='block-container'>", unsafe_allow_html=True)
         st.subheader("Channel Contribution (Pie Chart)")
-        fig2, ax2 = plt.subplots(figsize=(4, 3))
-        roi_df["Total Spend"].plot(kind="pie", autopct="%.1f%%", startangle=90, ax=ax2)
-        ax2.set_ylabel("")
+        fig, ax = plt.subplots(figsize=(4, 3))
+        roi_df["Total Spend"].plot(kind="pie", autopct="%.1f%%", startangle=90, ax=ax, colors=sns.color_palette("pastel"))
+        ax.set_ylabel("")
+        st.pyplot(fig)
+        st.markdown("</div>", unsafe_allow_html=True)
+    # Spend vs Revenue Bar block
+    with third_row[1]:
+        st.markdown("<div class='block-container'>", unsafe_allow_html=True)
+        st.subheader("Spend vs Revenue (Bar Chart)")
+        # Group spend and sales by channel
+        grouped = df.groupby("Channel")[["Spend", "Sales"]].sum()
+        fig2, ax2 = plt.subplots(figsize=(4,3))
+        colors = sns.color_palette("husl", grouped.shape[0])
+        ax2.bar(grouped.index, grouped["Spend"], label="Spend", color=colors, alpha=0.7)
+        ax2.bar(grouped.index, grouped["Sales"], label="Revenue", color=colors, alpha=0.4, bottom=grouped["Spend"])
+        ax2.set_ylabel("Amount ($)")
+        ax2.legend()
         st.pyplot(fig2)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    with chart_col3:
-        st.subheader("ROI Trend Over Time")
-        if "Date" in df.columns:
-            trend_df = df.groupby("Date")["Sales"].sum()
-            fig3, ax3 = plt.subplots(figsize=(4, 3))
-            trend_df.plot(ax=ax3, marker="o")
-            ax3.set_ylabel("Sales")
-            ax3.set_xlabel("Date")
-            st.pyplot(fig3)
-        else:
-            st.info("Date column not available for time trend.")
-
-    st.markdown("---")
-
-    analytics_col1, analytics_col2, analytics_col3 = st.columns(3)
-
-    with analytics_col1:
-        st.subheader("Spend vs Revenue Curve")
-        fig4, ax4 = plt.subplots(figsize=(4, 3))
-        ax4.scatter(df["Spend"], df["Sales"], color="mediumseagreen")
-        ax4.set_xlabel("Spend")
-        ax4.set_ylabel("Sales")
-        st.pyplot(fig4)
-
-    with analytics_col2:
-        st.subheader("Marginal ROI (Bar Chart)")
-        fig5, ax5 = plt.subplots(figsize=(4, 3))
-        roi_df["ROI"].plot(kind="bar", color="orange", ax=ax5)
-        ax5.set_ylabel("Marginal ROI")
-        st.pyplot(fig5)
-
-    with analytics_col3:
-        st.subheader("Budget Mix: Current vs Optimized")
-        optimized_spend = roi_df["Total Spend"].copy()
-        best_channel = roi_df["ROI"].idxmax()
-        optimized_spend[best_channel] *= 1.1
-        fig6, ax6 = plt.subplots(figsize=(4, 3))
-        ax6.bar(roi_df.index, roi_df["Total Spend"], label="Current", alpha=0.6)
-        ax6.bar(roi_df.index, optimized_spend, label="Optimized", alpha=0.6)
-        ax6.set_ylabel("Spend")
-        ax6.legend()
-        st.pyplot(fig6)
-
-    st.markdown("---")
-
+    # --- Fourth Row: Forecast Section (unchanged), with assumption note ---
+    st.markdown("<div class='block-container'>", unsafe_allow_html=True)
     controls_col1, controls_col2 = st.columns([1, 2])
-
     with controls_col1:
         st.subheader("Adjust Spend")
         new_spend = {}
         for channel in roi_df.index:
             val = st.slider(f"{channel} Spend", int(roi_df.loc[channel, "Total Spend"]*0.5), int(roi_df.loc[channel, "Total Spend"]*1.5), int(roi_df.loc[channel, "Total Spend"]))
             new_spend[channel] = val
-
     with controls_col2:
         st.subheader("Forecasted Revenue & ROI")
         forecasted_rev = sum(new_spend[ch] * roi_df.loc[ch, "ROI"] for ch in roi_df.index)
         st.metric("Forecasted Revenue", f"${forecasted_rev:,.0f}")
         st.metric("Forecasted ROI", f"{forecasted_rev / sum(new_spend.values()):.2f}" if sum(new_spend.values()) else "N/A")
+        fig3, ax3 = plt.subplots(figsize=(6, 3))
+        colors = sns.color_palette("husl", len(new_spend))
+        ax3.bar(new_spend.keys(), new_spend.values(), color=colors)
+        ax3.set_ylabel("Adjusted Spend")
+        st.pyplot(fig3)
+    st.markdown(
+        "<div class='small-font'>Assumption: ROI is assumed to remain constant with changes in spend. Real-world effects like diminishing returns or saturation are not accounted for in this simple model.</div>",
+        unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        fig7, ax7 = plt.subplots(figsize=(6, 3))
-        ax7.bar(new_spend.keys(), new_spend.values(), color="slateblue")
-        ax7.set_ylabel("Adjusted Spend")
-        st.pyplot(fig7)
-
-    st.markdown("---")
-
-    bottom_col1, bottom_col2, bottom_col3 = st.columns(3)
-
-    with bottom_col1:
-        st.subheader("Short-term vs Long-term ROI (Heatmap)")
-        if "Date" in df.columns:
-            pivot = df.pivot_table(index="Date", columns="Channel", values="Sales", aggfunc="sum").fillna(0)
-            fig8, ax8 = plt.subplots(figsize=(4, 3))
-            sns.heatmap(pivot, annot=True, cmap="coolwarm", ax=ax8)
-            st.pyplot(fig8)
-        else:
-            st.info("Date column not available for heatmap.")
-
-    with bottom_col2:
-        st.subheader("CAC by Channel")
-        cac = roi_df["Total Spend"] / roi_df["Incremental Revenue"].replace(0, np.nan)
-        st.dataframe(pd.DataFrame({"CAC": cac}).style.format({"CAC": "{:.2f}"}))
-
-    with bottom_col3:
-        st.subheader("LTV/CAC + Retention Impact")
-        retention_rate = 0.75
-        ltv = roi_df["Incremental Revenue"] * retention_rate
-        ltv_cac = ltv / cac.replace(0, np.nan)
-        st.dataframe(pd.DataFrame({"LTV/CAC": ltv_cac}).style.format({"LTV/CAC": "{:.2f}"}))
-
-    st.markdown("---")
-
-    st.subheader("Full ROI Table")
-    st.dataframe(roi_df.style.format({"ROI": "{:.2f}", "Total Spend": "{:,.0f}", "Incremental Revenue": "{:,.0f}"}))
+    # --- Removed fifth and sixth rows as per instruction ---

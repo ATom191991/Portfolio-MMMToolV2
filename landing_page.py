@@ -1,67 +1,75 @@
 import streamlit as st
 
+# --- Custom CSS for theme ---
+st.markdown("""
+    <style>
+    body, .main, .stApp {
+        background-color: #F2F2F2 !important;
+        color: #111 !important;
+    }
+    .block-container {
+        background-color: #E6F0FF !important;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #cfd8dc;
+        padding: 1.5em 1em 1.5em 1em;
+        margin-bottom: 1.5em;
+    }
+    .big-title {
+        font-size: 2.8em;
+        font-weight: bold;
+        color: #212A3E;
+        text-align: center;
+        margin-bottom: 0.1em;
+    }
+    .subtitle {
+        font-size: 1.3em;
+        color: #374151;
+        text-align: center;
+        margin-bottom: 1.5em;
+    }
+    .info-card {
+        background-color: #E6F0FF !important;
+        border-radius: 10px;
+        padding: 1.2em;
+        margin-bottom: 1em;
+        box-shadow: 0 2px 8px #cfd8dc;
+    }
+    .feature-list {
+        color: #334155;
+        font-size: 1.1em;
+        margin-left: 2em;
+    }
+    .cta-btn {
+        width: 100%;
+        height: 3em;
+        font-size: 1.15em;
+        font-weight: bold;
+        border-radius: 8px;
+        margin-bottom: 0.8em;
+        background-color: #212A3E !important;
+        color: #F7FAFC !important;
+        border: None;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 def landing_page():
     st.set_page_config(page_title="MMM ROI Dashboard", layout="centered")
 
-    st.markdown(
-        """
-        <style>
-        .main {
-            background-color: #F7FAFC;
-        }
-        .big-title {
-            font-size: 2.8em;
-            font-weight: bold;
-            color: #212A3E;
-            text-align: center;
-            margin-bottom: 0.1em;
-        }
-        .subtitle {
-            font-size: 1.3em;
-            color: #374151;
-            text-align: center;
-            margin-bottom: 1.5em;
-        }
-        .info-card {
-            background-color: #E6ECF5;
-            border-radius: 10px;
-            padding: 1.2em;
-            margin-bottom: 1em;
-            box-shadow: 0 2px 8px #e7eaf0;
-        }
-        .feature-list {
-            color: #334155;
-            font-size: 1.1em;
-            margin-left: 2em;
-        }
-        .cta-btn {
-            width: 100%;
-            height: 3em;
-            font-size: 1.15em;
-            font-weight: bold;
-            border-radius: 8px;
-            margin-bottom: 0.8em;
-            background-color: #212A3E !important;
-            color: #F7FAFC !important;
-            border: None;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
     st.markdown("<div class='big-title'>Marketing Mix Modeling ROI Dashboard</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>Unlock actionable insights from your marketing data.<br>Upload your campaign, analyze your spend, and download a professional report.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='subtitle'>A modern, streamlined dashboard for actionable marketing insights.<br>Upload your campaign, analyze your spend, and download a professional report.</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='info-card'><b>🚀 What can you do with this dashboard?</b>", unsafe_allow_html=True)
     st.markdown(
         """
         <ul class='feature-list'>
             <li>Run instant ROI analysis with sample data or your own Excel/CSV</li>
-            <li>Visualize your marketing spend, revenue, and ROI by channel</li>
-            <li>Interactively optimize budget allocation</li>
-            <li>Forecast revenue based on spend changes</li>
-            <li>Download a detailed PDF dashboard for sharing</li>
+            <li>View key marketing KPIs in clear, color-coded blocks</li>
+            <li>Analyze your Full ROI Table in a dedicated section</li>
+            <li>Visualize Channel Contribution and Spend vs Revenue with colored bar and pie charts</li>
+            <li>Interactively forecast your ROI and revenue based on budget adjustments</li>
+            <li>All visuals presented in clean, light blue blocks for clarity</li>
+            <li>Download a well-formatted PDF dashboard for sharing</li>
         </ul>
         </div>
         """,
@@ -74,7 +82,8 @@ def landing_page():
         <ol class='feature-list'>
             <li>Choose "Run Sample Report" to see a demo</li>
             <li>Or "Upload Your Data" to analyze your own campaign</li>
-            <li>Explore the interactive dashboard and download your report</li>
+            <li>Explore interactive KPIs, Full ROI Table, channel visuals, and forecast tools</li>
+            <li>Download your customized report for sharing</li>
         </ol>
         </div>
         """,
